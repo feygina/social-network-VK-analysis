@@ -1,0 +1,7 @@
+jupyter
+numpy
+requests
+networkx
+time
+collections
+seaborn
