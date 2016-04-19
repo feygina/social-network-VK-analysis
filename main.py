@@ -5,6 +5,8 @@ import requests
 import networkx as nx
 import matplotlib.pyplot as plt
 import time
+import numpy as np
+import scipy.spatial as spt
 import collections
 
 
@@ -105,3 +107,33 @@ def find_top_nodes(g, values):
     sorted_values = sorted(values.items(), key=lambda x: x[1], reverse=True)
     best = {i[0]: g.node[i[0]]['name'] for i in sorted_values[0:5]}
     return best
+
+
+def get_sparse_matrix(graph):
+    g_sparse = nx.utils.reverse_cuthill_mckee_ordering(graph)
+    reorder_nodes = list(g_sparse)
+    a = nx.to_numpy_matrix(graph, nodelist=reorder_nodes, dtype=int)
+    a = np.asarray(a)
+    return a
+
+
+def plot_similarity(a):
+    f, ax = plt.subplots(2, 2, figsize=(15,10))
+    ax[0, 0].imshow(a, cmap='Greens', interpolation='None')
+    ax[0, 0].set_title('Adjacency Matrix')
+
+    d = np.corrcoef(a)
+    ax[1, 0].imshow(d, cmap='Greens', interpolation='None')
+    ax[1, 0].set_title('Correlation coefficient')
+
+    distance = spt.distance.pdist(a, metric='euclidean')
+    d = spt.distance.squareform(distance)
+    ax[0, 1].imshow(d, cmap='Greens', interpolation='None')
+    ax[0, 1].set_title('Euclidean Distance')
+
+    distance = spt.distance.pdist(a, metric='cosine')
+    d = spt.distance.squareform(distance)
+    ax[1, 1].imshow(d, cmap='Greens', interpolation='None')
+    ax[1, 1].set_title('Cosine Distance')
+
+
