@@ -38,16 +38,16 @@ def get_graph_with_friends_connections(friend_ids):
     return g
 
 
-def draw_graph(g, parameter,  size_of_nodes):
+def draw_graph(g, parameter,  size_of_nodes, number):
     """
     draws plot according to parameter of interest and size of nodes
     """
-    node_labels = find_top_nodes(g, parameter)
+    node_labels = find_top_nodes(g, parameter, number)
     plt.xkcd()
-    plt.figure(1, figsize=(15, 10))
+    plt.figure(1, figsize=(30, 25))
     coord = nx.spring_layout(g)
     nx.draw(g, pos=coord, nodelist=parameter.keys(), node_size=[d*size_of_nodes for d in parameter.values()],
-            node_color=parameter.values(), font_size=15, cmap=plt.cm.get_cmap('RdBu_r'), labels=node_labels)
+            node_color=list(parameter.values()), font_size=25, cmap=plt.cm.get_cmap('RdBu_r'), labels=node_labels)
 
 
 def print_full_name_for_id(id_interest):
@@ -56,7 +56,7 @@ def print_full_name_for_id(id_interest):
     :return: string
     """
     response = requests.get('https://api.vk.com/method/users.get?user_ids={}'.format(id_interest)).json()[u'response']
-    print response[0][u'first_name'].strip() + ' ' + response[0][u'last_name'].strip()
+    print(response[0][u'first_name'].strip() + ' ' + response[0][u'last_name'].strip())
 
 
 def count_likes(ph):
@@ -103,9 +103,9 @@ def get_friends_information(g):
             print(g.node[i]['name'] + 'is fine')
 
 
-def find_top_nodes(g, values):
+def find_top_nodes(g, values, number):
     sorted_values = sorted(values.items(), key=lambda x: x[1], reverse=True)
-    best = {i[0]: g.node[i[0]]['name'] for i in sorted_values[0:5]}
+    best = {i[0]: g.node[i[0]]['name'] for i in sorted_values[0:number]}
     return best
 
 
@@ -168,3 +168,4 @@ def compare_graphs(graph):
     print('Erdos: ' + str(nx.diameter(erdos)))
     print('Barabasi: ' + str(nx.diameter(barabasi)))
     print('SW: ' + str(nx.diameter(small_world)))
+

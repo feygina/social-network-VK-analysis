@@ -9,6 +9,14 @@
 # if you remove the above rule, at least ignore the following:
 .ipynb_checkpoints
 /Project-1
+vk_login.py
+vk_token.py
+project_1.ipynb
+__pycache__
+.pyc
+vk_config.json
+vk_graph.ipynb
+graph.graphml
 # User-specific stuff:
 # .idea/workspace.xml
 # .idea/tasks.xml
