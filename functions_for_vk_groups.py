@@ -11,11 +11,6 @@ from IPython.display import SVG
 from vk_login import *
 
 
-vk_session = vk_api.VkApi(fey_login, fey_password)
-vk_session.authorization()
-vk = vk_session.get_api()
-
-
 def fetch_members_ids():
     ids = []
     for i in [1, 1000, 2000]:
@@ -26,6 +21,9 @@ def fetch_members_ids():
 
 
 def get_members_friends(members_ids):
+    vk_session = vk_api.VkApi(fey_login, fey_password)
+    vk_session.authorization()
+    vk = vk_session.get_api()
     # members_friends = {}
     with vk_api.VkRequestsPool(vk_session) as pool:
         members_friends = pool.method_one_param('friends.get', key='user_id', values=members_ids)
@@ -58,11 +56,14 @@ def create_members_graph(members):
 
 
 def make_list_with_members_info(g):
+    vk_session = vk_api.VkApi(fey_login, fey_password)
+    vk_session.authorization()
+    vk = vk_session.get_api()
     portions_of_ids = [int(len(g.nodes())/4)*i for i in range(0, 4)] + [len(g.nodes())]
     response = list()
     for i in range(0, 4):
         members_ids = ', '.join(map(str, g.nodes()[portions_of_ids[i]:portions_of_ids[i+1]]))
-        response += vk.users.get(user_ids = members_ids, fields = 'sex, city, education', lang = 'en')
+        response += vk.users.get(user_ids=members_ids, fields='sex, city, education', lang='en')
     return response
 
 
@@ -91,8 +92,21 @@ def set_attributes_to_nodes(graph, response, members_friends):
     return g
 
 
-def drop_lonely_users(g, number_of_connections):
-    node_degree = nx.degree(g)
+def drop_lonely_users(graph, number_of_connections):
+    node_degree = nx.degree(graph)
     to_remove = [n for n in node_degree if node_degree[n] <= number_of_connections]
-    g.remove_nodes_from(to_remove)
-    return g
+    graph.remove_nodes_from(to_remove)
+    return graph
+
+
+def get_basic_information(g):
+    print("'Data Mining Labs' network has {} active members with {} connections between each other."\
+          .format(g.number_of_nodes(), g.number_of_edges()))
+    print('Number of connected components = {}'.format(nx.number_connected_components(g)))
+
+
+def get_nodes_degree(g):
+    print('Max value of node degree = {}'.format(max(nx.degree(g).values())))
+    print('Mean value of node degree = {}'.format(np.mean(list(nx.degree(g).values()))))
+
+
